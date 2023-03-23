@@ -108,62 +108,25 @@ for object_file in glob(filter_path+"/"+fits_p):
     data /= general_flat_data
     expositions.append(data)
     count+=1
+
 (x_n, y_n) = np.shape(expositions[0])
-XY_r = np.zeros((x_n,y_n, 6))
-for x in range(x_n):
-    for y in range(y_n):
-        XY_r[x, y] = np.array([1, x,y, x**2, y**2, x*y])
 from photutils.segmentation import deblend_sources
 import matplotlib.pyplot as plt
 indexes = []
 for i in range(len(expositions)):
-    threshold = detect_threshold(expositions[i], nsigma = 5.)
-    sigma = 2.0*gaussian_fwhm_to_sigma
-    kernel = Gaussian2DKernel(sigma, x_size = 3, y_size = 3)
-    kernel.normalize()
-    convolved_data = convolve(expositions[i], kernel)
-    segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
-    segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
-    segm_deblend = deblend_sources(convolved_data, segm, npixels=5, nlevels=32, contrast=0.001).data
-    fig, ax = plt.subplots()
-    ax.imshow(segm_deblend)
-    fig.set_figwidth(segm_deblend.shape[0]/100)    #  ширина и
-    fig.set_figheight(segm_deblend.shape[1]/100)    #  высота "Figure"
-    fig.savefig(filter+'/result_segm'+str(i)+'.png')
-    
-    mask = np.sign(segm_deblend)
-    
-    #учет шума:
-    (x_n, y_n) = np.shape(mask)
-    XY =[]
-    F = []
 
-    for x in range(100,x_n-100):
-        for y in range(100,y_n-100):
-            if mask[x,y]==0:
-                XY.append([1, x,y, x**2, y**2, x*y])
-                F.append(expositions[i][x,y])
-    XY = np.array(XY)
-    #print(np.shape(XY))
-    F = np.array(F)
-    #print(np.shape(F))
-    B = np.linalg.inv(XY.transpose().dot(XY)).dot(XY.transpose())
-    B = B.dot(F)
-    noise = XY_r.dot(B)
-    expositions[i]-= noise
     expositions[i] *= np.max(exp_times)/exp_times[i]
     hdu = fits.PrimaryHDU(data=expositions[i])
     hdu_list = fits.HDUList([hdu])
     hdu_list.writeto(filter+'/result'+str(i)+'.fts', overwrite=True)
 
-    hdu = fits.PrimaryHDU(data=noise)
-    hdu_list = fits.HDUList([hdu])
-    hdu_list.writeto(filter+'/noise'+str(i)+'.fts', overwrite=True)
     star_region = expositions[i][0: 300, y_n-300:y_n-1]
     
     indexes.append(np.unravel_index(np.argmax(star_region), star_region.shape)+np.array([0, y_n-300]))
 
-
+sigma = 2.0*gaussian_fwhm_to_sigma
+kernel = Gaussian2DKernel(sigma, x_size = 3, y_size = 3)
+kernel.normalize()
 #складываем изображения
 shift = indexes[1]-indexes[0]
 #print(shift)
@@ -173,6 +136,35 @@ new_data = transform(*shift, expositions[1])
 #hdu_list.writeto(filter+'/result_shifted2.fts', overwrite=True)
 
 result_data = expositions[0]+new_data
+result_data = result_data[100:x_n-100, 100:y_n-100]
+
+threshold = detect_threshold(result_data, nsigma = 2.)
+convolved_data = convolve(result_data, kernel)
+segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
+segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
+segm_deblend = deblend_sources(convolved_data, segm, npixels=5, nlevels=32, contrast=0.001)
+mask =np.sign(segm_deblend.data)
+
+fig, ax = plt.subplots()
+ax.imshow(segm_deblend.data)
+fig.set_figwidth(segm_deblend.shape[0]/100)    #  ширина и
+fig.set_figheight(segm_deblend.shape[1]/100)    #  высота "Figure"
+fig.savefig(filter+'/segm_sum.png')
+
+from astropy.stats import SigmaClip
+from photutils.background import Background2D, MedianBackground
+sigma_clip = SigmaClip(sigma=3.0)
+bkg_estimator = MedianBackground()
+bkg = Background2D(result_data, (250, 250), filter_size=(3, 3),
+                   sigma_clip=sigma_clip, bkg_estimator=bkg_estimator, mask = mask)
+
+
+print(np.var(bkg.background)/len(bkg.background))
+result_data = result_data - bkg.background
+print(result_data[50,50])
+hdu = fits.PrimaryHDU(data=bkg.background)
+hdu_list = fits.HDUList([hdu])
+hdu_list.writeto(filter+'/noise.fts', overwrite=True)
 
 threshold = detect_threshold(result_data, nsigma = 10.)
 sigma = 3.0*gaussian_fwhm_to_sigma
@@ -238,5 +230,5 @@ for title in titles.keys():
 hdu = fits.PrimaryHDU(data=result_data)
 hdu_list = fits.HDUList([hdu])
 hdu_list.writeto(filter+'/result_sum.fts', overwrite=True)
-    
+
 #3 посчитать цвет (берем одну апертуру и одну экспозицую для всех фильтрах, BVR = RGB )
