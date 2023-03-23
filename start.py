@@ -109,6 +109,7 @@ for object_file in glob(filter_path+"/"+fits_p):
     expositions.append(data)
     count+=1
 
+#print(sec_per_pixel)
 (x_n, y_n) = np.shape(expositions[0])
 from photutils.segmentation import deblend_sources
 import matplotlib.pyplot as plt
@@ -159,9 +160,9 @@ bkg = Background2D(result_data, (250, 250), filter_size=(3, 3),
                    sigma_clip=sigma_clip, bkg_estimator=bkg_estimator, mask = mask)
 
 
-print(np.var(bkg.background)/len(bkg.background))
+#print(np.var(bkg.background)/len(bkg.background))
 result_data = result_data - bkg.background
-print(result_data[50,50])
+#print(result_data[50,50])
 hdu = fits.PrimaryHDU(data=bkg.background)
 hdu_list = fits.HDUList([hdu])
 hdu_list.writeto(filter+'/noise.fts', overwrite=True)

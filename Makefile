@@ -1,12 +1,17 @@
 dirs = R/ B/ V/ I/
-targets := result/R result/B result/V result/I
+targets :=$(addsuffix final, $(dirs)) $(addsuffix result_sum.fts, $(dirs)) 
 
-all: $(dirs) $(targets) 
+all: $(dirs) $(targets)
 
 %/:
 	mkdir -p $@
 
-result/%:
-	python3 start.py $(notdir $@)
+%/result_sum.fts: start.py
+	python3 start.py $(patsubst %/result_sum.fts,%,$@)
+
+%/final: %/result_sum.fts 
+	python3 photometry.py $(patsubst %/final,%,$@)
 
 .PHONY: all 
+
+
