@@ -1,24 +1,31 @@
 \documentclass [12pt, a4paper] {article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage[russian]{babel}
-\usepackage{geometry}
-\usepackage[pdftex]{graphicx}
-\graphicspath{{nnn/}}
-\graphicspath{{bbb/}}
-\DeclareGraphicsExtensions{.pdf,.png,.jpg}
-\usepackage{amsthm}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\usepackage{amsbsy}
-\usepackage{enumerate}
-\newtheorem{lemma}{Лемма}
-\theoremstyle{definition}
+	\usepackage{float}
+	\usepackage[utf8]{inputenc}
+	\usepackage{amsmath}
+	\usepackage{amssymb}
+	\usepackage[russian]{babel}
+	\usepackage[pdftex]{graphicx}
+	\graphicspath{{pictures/}}
+	\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+	\usepackage{amsthm}
+	\usepackage{tikz}
+	\usepackage{pgfplots}
+	\usepackage{amsbsy}
+	\usepackage{enumerate}
+	\newtheorem{lemma}{Лемма}
+	\theoremstyle{definition}
 \begin{document}
 	\section{Общая информация об обьекте наблюдения}
 	Линзовидная галактика NGC7465. Координаты: $\alpha=23^{\circ} 02^{\prime} 16^{\prime \prime}.04$, $\delta = +15^{\circ}59^{\prime}33^{\prime \prime}.80$~(эпоха J2004.600). Дата наблюдений - 17.08.2004, время - 00:22:05. Детектор - EEV~CCD42-40, угловой масштаб пикселя - $0^{\prime \prime}.357\times0^{\prime \prime}.357$, размер матрицы - $1046\times1044$ пикселей. Наблюдения производились в фильтрах B, V, I, R. Для всех фильтров получены кадры обьектов, плоского поля и смещения. Кадров теневого тока нет, но температура матрицы при наблюдении (во всех фильтрах) порядка $150^\circ$K, поэтому теневым током можно принебречь.
 	\section{Обработка данных}
 	Из кадров экспозиции был вычтен кадр полученный усреденением всех кадров смещения, затем каждый кадр был поделен на кадр, полученный как медиана кадров плоского поля. На кадрах плоского поля присутствуют яркие точки (скорее всего соответсвующие ярким звездам), но они находятся вдали от области кадра в котором находилась галактика, поэтому их наличие было проигнорировано. Затем полученные обработанные кадры экспозиции были совмещены и сложены. 
 	При учете плоского поля в центре кадра ушли все видимые артефакты, сократилось виньетирование. 
+	\begin{figure}[!b] 
+	\centering
+			\includegraphics[width = 0.39\textwidth]{result.png}
+			\includegraphics[width = 0.39\textwidth]{result_w_noize.png}
+			\caption{Пример изображения обьекта до (слева) и после вычета шума (фильтр R) }
+	\end{figure}
+	\par Судя по изображениям, галактика имеет якрий центр, форма которого близка к эллипсу, и два тусклых спиральных рукава.
+	\section{Фотометрия}
 \end{document}
