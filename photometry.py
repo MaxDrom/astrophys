@@ -1,7 +1,7 @@
 from glob import glob
 from astropy.io import fits
 import numpy as np
-from numba import njit, prange
+#from numba import njit, prange
 import sys
 from astropy.convolution import Gaussian2DKernel
 from photutils.segmentation import detect_sources
@@ -36,7 +36,7 @@ def is_in_bounds(i, j, data):
     result = result and (j>=0) and (j<np.shape(data)[1]) 
     return result
 
-@njit(fastmath=True)
+#@njit(fastmath=True)
 def subf(x,y):
         return (1-y)*(1-x)+x*y
 
@@ -94,7 +94,7 @@ def dcircle_I(R,x_c, y_c ,N_r, N_phi, data):
         y = R*math.sin(phi)+y_c
         phi += dphi
         result+= R*I(x, y, data)*dphi
-    return result
+    return result/math.pi/2/R
 
 
 with fits.open("./"+filter+"/result_sum.fts") as data_hdu:
@@ -129,17 +129,19 @@ grad = np.array([math.cos(math.pi/4), -math.sin(math.pi/4)])
 antigrad = np.array([grad[1], -grad[0]])
 
 (x, y) = do_plot_data(100, 1, 150, lambda r  : circle_I(r, center[0], center[1], 10, 10, result_data))
-
+y=-2.5*np.log(y)
+y = y-26.74-26*2.5*math.log(3.828)
 plt.figure(figsize=(20, 10))
 plt.plot(x, y)
 plt.xlabel(r'$r$ in seconds')
-plt.ylabel(r'$I(x)$')
+plt.ylabel(r'$m(r)$')
 plt.savefig(filter+'/slice_'+"I(R)"+ '.png')  
 
 (x, y) = do_plot_data(100, 1, 150, lambda r  : dcircle_I(r, center[0], center[1], 10, 100, result_data))
-
+y=-2.5*np.log(y)
+y = y-26.74+26*2.5*math.log(3.828)
 plt.figure(figsize=(20, 10))
 plt.plot(x, y)
 plt.xlabel(r'$r$ in seconds')
-plt.ylabel(r'$I(x)$')
+plt.ylabel(r'$m(r)$')
 plt.savefig(filter+'/slice_'+"dI(R)"+ '.png')  

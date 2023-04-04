@@ -1,7 +1,7 @@
 from glob import glob
 from astropy.io import fits
 import numpy as np
-from numba import njit, prange
+#from numba import njit, prange
 import sys
 from astropy.convolution import Gaussian2DKernel
 from photutils.segmentation import detect_sources
@@ -31,17 +31,17 @@ def get_sub_images():
 def get_data(hdu : fits.hdu.hdulist.HDUList):
     return hdu[0].data*hdu[0].header["GAIN"]+hdu[0].header["BZERO"]
 
-@njit(fastmath=True)
+#@njit(fastmath=True)
 def is_in_bounds(i, j, data):
     result = (i>=0) and (i<np.shape(data)[0]) 
     result = result and (j>=0) and (j<np.shape(data)[1]) 
     return result
 
-@njit(fastmath=True)
+#@njit(fastmath=True)
 def subf(x,y):
         return (1-y)*(1-x)+x*y
 
-@njit(fastmath=True)
+#@njit(fastmath=True)
 def I(x, y, data):
     i = math.floor(x)
     j = math.floor(y)
@@ -55,7 +55,7 @@ def I(x, y, data):
                 result+= subf(k-i,f_x)*subf(l-j, f_y)*data[k, l]
     return result
 
-@njit(fastmath=True, parallel = True)
+#@njit(fastmath=True, parallel = True)
 def transform(dx, dy, data):
     new_data = np.zeros(data.shape)
     n = data.shape[0]
@@ -125,7 +125,7 @@ for i in range(len(expositions)):
     
     indexes.append(np.unravel_index(np.argmax(star_region), star_region.shape)+np.array([0, y_n-300]))
 
-sigma = 2.0*gaussian_fwhm_to_sigma
+sigma = 3.0*gaussian_fwhm_to_sigma
 kernel = Gaussian2DKernel(sigma, x_size = 3, y_size = 3)
 kernel.normalize()
 #складываем изображения
@@ -142,10 +142,13 @@ result_data = result_data[100:x_n-100, 100:y_n-100]
 threshold = detect_threshold(result_data, nsigma = 2.)
 convolved_data = convolve(result_data, kernel)
 segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
-segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
 segm_deblend = deblend_sources(convolved_data, segm, npixels=5, nlevels=32, contrast=0.001)
 mask =np.sign(segm_deblend.data)
-
+mask =np.ones(mask.shape) - mask
+mask = (mask == 0)
+#mask = np.ones(mask.shape)
+#mask[mask.shape[0]//2-50:mask.shape[0]//2+50, mask.shape[1]//2-50: mask.shape[1]//2+50]= int(0)
+#mask =np.sign(segm_deblend.data)
 fig, ax = plt.subplots()
 ax.imshow(segm_deblend.data)
 fig.set_figwidth(segm_deblend.shape[0]/100)    #  ширина и
@@ -156,7 +159,7 @@ from astropy.stats import SigmaClip
 from photutils.background import Background2D, MedianBackground
 sigma_clip = SigmaClip(sigma=3.0)
 bkg_estimator = MedianBackground()
-bkg = Background2D(result_data, (250, 250), filter_size=(3, 3),
+bkg = Background2D(result_data, (50, 50), filter_size=(3, 3),
                    sigma_clip=sigma_clip, bkg_estimator=bkg_estimator, mask = mask)
 
 
@@ -221,6 +224,8 @@ for title in titles.keys():
         y.append(I(*(center+t*direction), result_data))
         t+=0.5
     
+    y=-2.5*np.log(y)
+    y = y-26.74+26*2.5*math.log(3.828)
     plt.figure(figsize=(20, 10))
     plt.plot(x, y)
     plt.xlabel(r'$x$ in seconds')
