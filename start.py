@@ -104,6 +104,8 @@ for object_file in glob(filter_path+"/"+fits_p):
         data = get_data(object_hdu)
         sec_per_pixel = float(object_hdu[0].header["IMSCALE"].split('x')[0])
         exp_times.append(object_hdu[0].header["EXPTIME"])
+    #print(filter)
+    print(data.shape)
     data -= general_bias_data
     data /= general_flat_data
     expositions.append(data)
