@@ -146,6 +146,7 @@ convolved_data = convolve(result_data, kernel)
 segm = detect_sources(convolved_data, threshold, connectivity=8, npixels = 5)
 segm_deblend = deblend_sources(convolved_data, segm, npixels=5, nlevels=32, contrast=0.001)
 mask =np.sign(segm_deblend.data)
+mask[mask.shape[0]//2-100:mask.shape[0]//2+100, mask.shape[1]//2-100: mask.shape[1]//2+100]= 1
 mask =np.ones(mask.shape) - mask
 mask = (mask == 0)
 #mask = np.ones(mask.shape)
@@ -165,9 +166,9 @@ bkg = Background2D(result_data, (50, 50), filter_size=(3, 3),
                    sigma_clip=sigma_clip, bkg_estimator=bkg_estimator, mask = mask)
 
 
-#print(np.var(bkg.background)/len(bkg.background))
+print(np.var(bkg.background)/len(bkg.background))
 result_data = result_data - bkg.background
-#print(result_data[50,50])
+print(result_data[200,200])
 hdu = fits.PrimaryHDU(data=bkg.background)
 hdu_list = fits.HDUList([hdu])
 hdu_list.writeto(filter+'/noise.fts', overwrite=True)
@@ -226,13 +227,13 @@ for title in titles.keys():
         y.append(I(*(center+t*direction), result_data))
         t+=0.5
     
-    y=-2.5*np.log(y)
-    y = y-26.74+26*2.5*math.log(3.828)
+    #y=-2.5*np.log(y)
+    #y = y-26.74+26*2.5*math.log(3.828)
     plt.figure(figsize=(20, 10))
     plt.plot(x, y)
     plt.xlabel(r'$x$ in seconds')
     plt.ylabel(r'$I(x)$')
-    plt.savefig(filter+'/slice_'+title+ '.png')    
+    plt.savefig(filter+'/'+filter+'_slice_'+title+ '.png')    
     
 
 hdu = fits.PrimaryHDU(data=result_data)
