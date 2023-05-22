@@ -30,6 +30,19 @@
 	\section{Фотометрия}
 	Для учета шума кадр изображения был поделен на блоки размером $50\times50$ пикселей. Внутри каждого блока было взято медианное значение потока пикселей, не принадлежащих маске обьектов, составленной с помощью деблендинга. Затем, с помощью билинейной интерполяции, было получено значения шума под обьектом наблюдения.
 	\par Как видно из приведенных срезов, в фильтрах B и I имеет место блюминг.
+	\par
+	\begin{tabular}{p{1.5cm}|p{5cm}|p{5cm}}
+	\hline
+	Фильтр & Интегральная звездная величина & Поверхностная яркость в центре \\
+	\hline\hline
+	R & $-162^{m}.13$ & $27^{m/{\prime \prime}^2}.54$\\
+	\hline
+	B &$-162^{m}.59$ & $28^{m/{\prime \prime}^2}.83$\\
+	\hline
+	V &$-158^{m}.39$ & $30^{m/{\prime \prime}^2}.70$\\
+	\hline
+	I &$-159^{m}.99$ & $29^{m/{\prime \prime}^2}.91$\\
+	\end{tabular}
 \begin{figure}
 		\centering
 			\includegraphics[width = 0.8\textwidth]{R_slice_min.png}
@@ -69,5 +82,65 @@
 		\centering
 			\includegraphics[width = 0.8\textwidth]{V_slice_max.png}
 			\caption{Срез потока по направлению, вдоль которого профиль наименьший. Фильтр V}
+\end{figure}
+\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{R_slice_min.png}
+			\caption{Срез потока по направлению, вдоль которого профиль наименьший. Фильтр R}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{I_slice_min.png}
+						\caption{Срез потока по направлению, вдоль которого профиль наименьший. Фильтр I}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{B_slice_min.png}
+						\caption{Срез потока по направлению, вдоль которого профиль наименьший. Фильтр B}
+					\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{V_slice_min.png}
+			\caption{Срез потока по направлению, вдоль которого профиль наименьший. Фильтр V}
+\end{figure}
+\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{R_slice_I(R).png}
+			\caption{Зависимость величины потока от радиуса апертуры. Фильтр R}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{I_slice_I(R).png}
+						\caption{Зависимость величины потока от радиуса апертуры. Фильтр I}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{B_slice_I(R).png}
+						\caption{Зависимость величины потока от радиуса апертуры. Фильтр B}
+					\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{V_slice_I(R).png}
+			\caption{Зависимость величины потока от радиуса апертуры. Фильтр V}
+\end{figure}
+\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{R_slice_dI(R).png}
+			\caption{Азимутально-осреднённый профиль. Фильтр R}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{I_slice_dI(R).png}
+						\caption{Азимутально-осреднённый профиль. Фильтр I}
+		\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{B_slice_dI(R).png}
+						\caption{Азимутально-осреднённый профиль. Фильтр B}
+					\end{figure}
+		\begin{figure}
+		\centering
+			\includegraphics[width = 0.8\textwidth]{V_slice_dI(R).png}
+			\caption{Азимутально-осреднённый профиль. Фильтр V}
 \end{figure}
 \end{document}
